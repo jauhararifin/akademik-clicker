@@ -68,14 +68,17 @@ func perform_login() bool {
  	urlValues.Add("execution", formExec)
  	urlValues.Add("_eventId", formEventId)
  	urlValues.Add("submit", formSubmit)
+ 	resp.Body.Close()
 
  	resp, err = httpClient.PostForm(formAction, urlValues)
  	if err != nil {
     	fmt.Println(err.Error())
     	return false
     }
+    statC := resp.StatusCode
+    resp.Body.Close()
     
-    return resp.StatusCode == 200
+    return statC == 200
 }
 
 func perform_take(subject string) (ret bool) {
@@ -90,6 +93,7 @@ func perform_take(subject string) (ret bool) {
     	return false
     }
     body := string(bodyBytes)
+    resp.Body.Close()
     for strings.Index(body, "Login | SIX") > -1 {
     	fmt.Println("Not logged in, trying to login")
     	perform_login()
@@ -101,6 +105,7 @@ func perform_take(subject string) (ret bool) {
 	    }
 	    bodyBytes, _ = ioutil.ReadAll(resp.Body)
 	    body = string(bodyBytes)
+	    resp.Body.Close()
 
 	    time.Sleep(2 * time.Second)
     }
@@ -131,6 +136,7 @@ func perform_take(subject string) (ret bool) {
     	fmt.Println(err.Error())
     	return false
     }
+    resp.Body.Close()
 
     return true
 }
