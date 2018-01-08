@@ -10,6 +10,8 @@ import "os"
 import "strings"
 import "net/url"
 import "net/http/cookiejar"
+import "time"
+import "math/rand"
 
 var config Configuration
 var httpClient http.Client
@@ -99,9 +101,14 @@ func perform_take(subject string) (ret bool) {
 	    }
 	    bodyBytes, _ = ioutil.ReadAll(resp.Body)
 	    body = string(bodyBytes)
+
+	    time.Sleep(2 * time.Second)
     }
 
     pos := strings.Index(body, "id=\"form__token\"")
+    if pos < 0 {
+    	return false
+    }
     pos = strings.Index(body[pos:], "value") + 7 + pos
  	cnt := 0
  	for ;body[pos+cnt] != '"';cnt++ {}
@@ -161,5 +168,9 @@ func main() {
     	fmt.Println("Trying to get subject:", config.Subjects[i])
     	perform_take(config.Subjects[i])
     	i = (i + 1) % len(config.Subjects)
+
+    	if i == 0 {
+    		time.Sleep(time.Duration(7 + rand.Int31()%5) * time.Second)
+    	}
     }
 }
